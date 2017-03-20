@@ -1,0 +1,24 @@
+{
+  "name": "style-slice",
+  "version": "0.0.1",
+  "description": "CSS in .js file",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "pretest": "yarn build",
+    "prepublish": "yarn build",
+    "test": "eslint src test",
+    "build": "babel src --out-dir lib --presets env"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-preset-env": "^1.2.2",
+    "eslint": "^3.18.0",
+    "eslint-config-standard": "^7.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.1.1"
+  }
+}
