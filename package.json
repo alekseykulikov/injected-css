@@ -10,14 +10,19 @@
   "scripts": {
     "pretest": "yarn build",
     "prepublish": "yarn build",
-    "test": "eslint src test",
+    "test": "eslint src test && browserify-test -t [ babelify --presets env ] ./test/index.js",
+    "test:watch": "browserify-test -w -t [ babelify --presets env ] ./test/index.js",
     "build": "babel src --out-dir lib --presets env"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-preset-env": "^1.2.2",
+    "babelify": "^7.3.0",
+    "browserify-test": "^3.1.0",
+    "chai": "^3.5.0",
     "eslint": "^3.18.0",
     "eslint-config-standard": "^7.1.0",
+    "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^2.1.1"
   }
