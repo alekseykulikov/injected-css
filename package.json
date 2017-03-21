@@ -1,7 +1,7 @@
 {
-  "name": "style-slice",
+  "name": "csswithjs",
   "version": "0.0.1",
-  "description": "CSS in .js file",
+  "description": "CSS with JS",
   "license": "MIT",
   "main": "lib/index.js",
   "files": [

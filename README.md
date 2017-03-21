@@ -1,14 +1,14 @@
-# style-slice
+# csswithjs
 
-> CSS in .js file.
+> CSS with JS files.
 
 ## Example
 
 ```js
-import { css } from 'style-slice'
+import { css } from 'csswithjs'
 import { red, white, mobile } from '../theme'
 
-const style = css`
+const style = css`{
   text-align: center;
 
   &-button {
@@ -27,7 +27,7 @@ const style = css`
       width: 160px
     }
   }
-`
+}`
 
 document.innerHTML = `
   <div class="${style}">

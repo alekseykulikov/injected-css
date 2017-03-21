@@ -33,3 +33,7 @@ export function css (selector, declarations, nesting = []) {
 
   return rule
 }
+
+// minuses:
+// - nested css rules depend on parent, but they don't know about this
+// - returning object has a lot of unnecessary data
