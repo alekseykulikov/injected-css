@@ -1,42 +1,37 @@
 /* eslint-env mocha */
 import { expect } from 'chai'
+import { jsdom } from 'jsdom'
 import { red, white, mobile } from './support/theme'
 import { css } from '../src'
 
-describe('csswithjs', () => {
-  describe('css(selector: string, declarations: string, nesting: Array<Rule>): Rule', () => {
-    it('generates object class names', () => {
-      const style = css`{
-        text-align: center;
+describe('injected-css', () => {
+  beforeEach(() => {
+    global.document = jsdom()
+  })
 
-        &-button {
-          background-color: ${red};
-          width: 32rem;
-          padding: 2rem;
-          border-radius: 0.5rem;
-          border: none;
-          outline: none;
+  it('generates object with class names', () => {
+    const style = css`{
+      text-align: center;
 
-          &:hover {
-            color: ${white};
-          }
+      &-button {
+        background-color: ${red};
+        width: 32rem;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        border: none;
+        outline: none;
 
-          @media ${mobile} {
-            width: 16rem;
-          }
+        &:hover {
+          color: ${white};
         }
-      }`
 
-      expect(`${style}`).equal(componentName)
-      expect(`${style.button}`).equal(`${componentName}-button`)
-    })
+        @media ${mobile} {
+          width: 16rem;
+        }
+      }
+    }`
 
-    it('validates arguments')
+    expect(`${style}`).a('string')
+    expect(`${style.button}`).equal(`${style}-button`)
   })
 })
-
-css.inject('string with styles', 'uniqueid')
-export const style = {
-  toString () { return 'MyComponent' },
-  button: 'MyComponent-button'
-}

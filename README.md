@@ -1,11 +1,11 @@
-# csswithjs
+# injected-css
 
-> CSS with JS files.
+> CSS in JS file.
 
 ## Example
 
 ```js
-import { css } from 'csswithjs'
+import { css } from 'injected-css'
 import { red, white, mobile } from '../theme'
 
 const style = css`{
@@ -31,7 +31,7 @@ const style = css`{
 
 document.innerHTML = `
   <div class="${style}">
-    <button class="${style.button}">Click me!</button>
+    <button type="button" class="${style.button}">Click me!</button>
   </div>
 `
 ```

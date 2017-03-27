@@ -1,29 +1,30 @@
 {
-  "name": "csswithjs",
+  "name": "injected-css",
   "version": "0.0.1",
-  "description": "CSS with JS",
+  "description": "CSS in JS file",
   "license": "MIT",
   "main": "lib/index.js",
   "files": [
     "lib"
   ],
   "scripts": {
-    "pretest": "yarn build",
     "prepublish": "yarn build",
-    "test": "eslint src test && browserify-test -t [ babelify --presets env ] ./test/index.js",
-    "test:watch": "browserify-test -w -t [ babelify --presets env ] ./test/index.js",
+    "test": "eslint src test && mocha ./test/index.js",
     "build": "babel src --out-dir lib --presets env"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-preset-env": "^1.2.2",
+    "babel-register": "^6.24.0",
     "babelify": "^7.3.0",
-    "browserify-test": "^3.1.0",
     "chai": "^3.5.0",
+    "env-test": "^1.0.0",
     "eslint": "^3.18.0",
     "eslint-config-standard": "^7.1.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^2.1.1"
+    "eslint-plugin-standard": "^2.1.1",
+    "jsdom": "^9.12.0",
+    "mocha": "^3.2.0"
   }
 }
