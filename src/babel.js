@@ -1,5 +1,13 @@
+const template = require('babel-template')
 const postcss = require('postcss')
+
 const prefixer = postcss([ require('postcss-cssnext') ])
+const objectTemplate = template(`
+  style = { toString() { return PREFIX } }
+`)
+const injectTemplate = template(`
+  css.inject(COMPILED_SRC);
+`)
 
 module.exports = ({ types: t }) => {
   return {
@@ -13,14 +21,25 @@ module.exports = ({ types: t }) => {
               console.log(node.selector)
             }
           })
-          const style = `{
-            toString () {
-              return '${prefix}'
-            }
-          }`
-          const inject = `css.inject(\`${src}\`)`
-          console.log(style)
-          console.log(inject)
+          // const style = `{
+          //   toString () {
+          //     return '${prefix}'
+          //   }
+          // }`
+          // const inject = `css.inject(\`${src}\`)`
+          // console.log(style)
+          // console.log(inject)
+          path.parentPath.parentPath.insertBefore(injectTemplate({
+            COMPILED_SRC: t.stringLiteral(src)
+          }))
+          path.parentPath.replaceWith(objectTemplate({
+            PREFIX: t.stringLiteral(prefix)
+          }))
+
+          // t.callExpression(
+          //   t.memberExpression(t.identifier('css'), t.identifier('inject')),
+          //   [t.templateLiteral(t.identifier(src)]
+          // )
         } else if (tag.object && tag.property && tag.object.name === 'inject' && tag.property.name === 'css') {
           const { src } = extractCss(path)
           console.log(`css.inject(\`${src}\`)`)
