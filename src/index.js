@@ -5,7 +5,6 @@ export function css () {
 export const inject = {}
 
 inject.css = css.inject = function injectCss (str) {
-  console.log('inject "%s"', str)
   makeStyleTag(str)
 }
 
