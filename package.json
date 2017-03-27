@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "prepublish": "yarn build",
-    "test": "eslint src test && mocha ./test/index.js",
+    "test": "eslint src test && BABEL_DISABLE_CACHE=1 mocha ./test/index.js",
     "build": "babel src --out-dir lib --presets env"
   },
   "devDependencies": {
@@ -26,5 +26,9 @@
     "eslint-plugin-standard": "^2.1.1",
     "jsdom": "^9.12.0",
     "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "postcss": "^5.2.16",
+    "postcss-cssnext": "^2.10.0"
   }
 }
