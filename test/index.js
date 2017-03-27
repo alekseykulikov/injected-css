@@ -14,7 +14,7 @@ describe('injected-css', () => {
       text-align: center;
 
       &-button {
-        background-color: ${red};
+        background: ${red};
         width: 32rem;
         padding: 2rem;
         border-radius: 0.5rem;
@@ -22,16 +22,26 @@ describe('injected-css', () => {
         outline: none;
 
         &:hover {
-          color: ${white};
+          background: ${white};
         }
 
         @media ${mobile} {
           width: 16rem;
+        }
+
+        &-icon {
+          color: ${red};
+        }
+
+        &-text {
+          color: ${white};
         }
       }
     }`
 
     expect(`${style}`).a('string')
     expect(`${style.button}`).equal(`${style}-button`)
+    expect(`${style.button.icon}`).equal(`${style}-button-icon`)
+    expect(`${style.button.text}`).equal(`${style}-button-text`)
   })
 })
