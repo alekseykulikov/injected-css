@@ -37,11 +37,22 @@ describe('injected-css', () => {
           color: ${white};
         }
       }
+
+      &-logo {
+        height: 1.6rem;
+        width: 1.6rem;
+      }
     }`
 
-    expect(`${style}`).a('string')
     expect(`${style.button}`).equal(`${style}-button`)
     expect(`${style.button.icon}`).equal(`${style}-button-icon`)
     expect(`${style.button.text}`).equal(`${style}-button-text`)
+    expect(`${style.logo}`).equal(`${style}-logo`)
+
+    expect(style).keys(['toString', 'button', 'logo'])
+    expect(style.button).keys(['toString', 'icon', 'text'])
+    expect(`${style}`).a('string')
+    expect(style.logo).a('string')
+    expect(style.button.icon).a('string')
   })
 })

@@ -30,6 +30,7 @@
   "dependencies": {
     "babylon": "^6.16.1",
     "postcss": "^5.2.16",
-    "postcss-cssnext": "^2.10.0"
+    "postcss-cssnext": "^2.10.0",
+    "string-hash": "^1.1.3"
   }
 }
