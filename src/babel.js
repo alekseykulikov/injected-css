@@ -30,12 +30,12 @@ module.exports = () => {
             return node.selector
           })
           const propertiesString = transformNestedObjectToString(generateNestedObject(selectors, prefix))
-          const injectExpression = parse(`css.inject(\`${src}\`)`).program.body[0].expression
-          path.parentPath.parentPath.insertBefore(injectExpression)
+          const injectExpression = parse(`css.inject(\`${src}\`);\n`).program.body[0].expression
+          path.parentPath.parentPath.insertAfter(injectExpression)
           path.replaceWithSourceString(propertiesString)
         } else if (tag.object && tag.property && tag.object.name === 'inject' && tag.property.name === 'css') {
-          const { src } = extractCss(path)
-          console.log(`css.inject(\`${src}\`)`)
+          const { src } = extractCss(path, true)
+          path.replaceWithSourceString(`inject.css(\`${src}\`)`)
         }
       }
     }
@@ -51,10 +51,11 @@ module.exports = () => {
  * https://github.com/threepointone/glamor/blob/master/src/css/babel.js#L156
  *
  * @param {Path} path
+ * @param {boolean} isGlobal
  * @return {string}
  */
 
-function extractCss (path) {
+function extractCss (path, isGlobal = false) {
   const code = path.hub.file.code
   const stubs = path.node.quasi.expressions.map(x => code.substring(x.start, x.end))
   const strs = path.node.quasi.quasis.map(x => x.value.cooked)
@@ -72,7 +73,7 @@ function extractCss (path) {
     return arr
   }, []).join('')
 
-  const prefix = '.c' + stringHash(code)
+  const prefix = isGlobal ? '' : '.c' + stringHash(code)
   const result = processor.process(prefix + src)
   const newSrc = result.css.replace(/stub-[0-9]+/gm, x => '${' + stubCtx[x] + '}')
   return { src: newSrc, root: result.root, prefix }
@@ -111,9 +112,9 @@ function transformNestedObjectToString (obj) {
       return `"${prop}": ${transformNestedObjectToString(child)}`
     })
     return `{
-      toString() { return "${obj.root}" },
+      toString() { return "${obj.root.substr(1)}" },
       ${children.join(',')}
     }`
   }
-  return `"${obj.root}"`
+  return `"${obj.root.substr(1)}"` // remove "." from begining
 }

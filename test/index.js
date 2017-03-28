@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 import { expect } from 'chai'
 import { jsdom } from 'jsdom'
-import { red, white, mobile } from './support/theme'
-import { css } from '../src'
+import { red, white, mobile, medium } from './support/theme'
+import { css, inject } from '../src'
 
 describe('injected-css', () => {
   beforeEach(() => {
     global.document = jsdom()
   })
 
-  it('generates object with class names', () => {
+  it('#css generates object with class names', () => {
     const style = css`{
       text-align: center;
 
@@ -54,5 +54,23 @@ describe('injected-css', () => {
     expect(`${style}`).a('string')
     expect(style.logo).a('string')
     expect(style.button.icon).a('string')
+  })
+
+  it('#inject.css generates global styles', () => {
+    inject.css`
+      html {
+        font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        font-weight: normal;
+        font-size: 62.5%; /* 1rem ~ 10px */
+
+        @media ${medium} {
+          font-size: 56.25%; /* 1rem ~ 9px */
+        }
+
+        @media ${mobile} {
+          font-size: 50%; /* 1rem ~ 8px */
+        }
+      }
+    `
   })
 })
