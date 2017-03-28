@@ -79,27 +79,22 @@ function extractCss (path) {
 }
 
 /**
- * Transform `selectors` to nested object of `{ root, children }`
- * to nested structure of selectors
+ * Transform `selectors` to nested object of `{ root, children }`.
  *
  * @param {Array<string>} selectors
- * @param {string} prefix
+ * @param {string} rootSelector
+ * @param {number} level - current nesting level
  * @return {Object}
  */
 
-function generateNestedObject (selectors, prefix, index) {
-  return {
-    root: selectors[0],
-    children: [{
-      root: selectors[1],
-      children: [
-        { root: selectors[2], children: [] },
-        { root: selectors[3], children: [] }
-      ]
-    }, {
-      root: selectors[4], children: []
-    }]
-  }
+function generateNestedObject (selectors, rootSelector, level = 1) {
+  const childrenSelectors = selectors.filter(selector => {
+    return selector !== rootSelector && selector.indexOf(rootSelector) === 0 && selector.split('-').length === (level + 1)
+  })
+  const children = childrenSelectors.map((childSeletor) => {
+    return generateNestedObject(selectors, childSeletor, level + 1) // TODO optimize selectors filtering
+  })
+  return { root: rootSelector, children }
 }
 
 /**
