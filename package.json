@@ -1,7 +1,7 @@
 {
   "name": "injected-css",
   "version": "0.0.1",
-  "description": "CSS in JS file",
+  "description": "Structured way to write CSS in JS file",
   "license": "MIT",
   "main": "lib/index.js",
   "files": [
