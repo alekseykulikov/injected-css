@@ -7,6 +7,9 @@
   "files": [
     "lib"
   ],
+  "engines": {
+    "node": ">=6"
+  },
   "scripts": {
     "prepublish": "yarn build",
     "test": "eslint src test && BABEL_DISABLE_CACHE=1 mocha ./test/index.js",
