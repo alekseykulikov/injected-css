@@ -17,7 +17,7 @@ const processor = postcss([ cssnext ])
  * inject.css`body { font-size: 10px }`
  */
 
-module.exports = () => {
+module.exports = ({ types: t }) => {
   return {
     visitor: {
       TaggedTemplateExpression (path) {
@@ -30,8 +30,8 @@ module.exports = () => {
             return node.selector
           })
           const propertiesString = transformNestedObjectToString(generateNestedObject(selectors, prefix))
-          const injectExpression = parse(`css.inject(\`${src}\`);\n`).program.body[0].expression
-          path.parentPath.parentPath.insertAfter(injectExpression)
+          const injectExpression = parse(`css.inject(\`${src}\`)`).program.body[0].expression
+          path.parentPath.parentPath.insertBefore(t.expressionStatement(injectExpression))
           path.replaceWithSourceString(propertiesString)
         } else if (tag.object && tag.property && tag.object.name === 'inject' && tag.property.name === 'css') {
           const { src } = extractCss(path, true)
