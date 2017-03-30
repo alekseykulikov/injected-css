@@ -1,13 +1,33 @@
 const { parse } = require('babylon')
+const deasync = require('deasync')
 const postcss = require('postcss')
-const cssnext = require('postcss-cssnext')
+const nesting = require('postcss-nesting')
+const loadConfig = require('postcss-load-config')
 const stringHash = require('string-hash')
 
 /**
  * Initialize postcss `processor`.
+ * Use `deasync` to make async methods sync.
  */
 
-const processor = postcss([ cssnext ])
+const parseConfig = deasync((cb) => {
+  loadConfig({}, '', { argv: false })
+  .then(c => cb(null, c))
+  .catch((err) => {
+    if (err.toString().indexOf('No PostCSS Config found in') !== -1) return cb(null, {}) // ignore, not required
+    return cb(err)
+  })
+})
+
+const config = parseConfig()
+const plugins = (config.plugins || []).concat(nesting())
+const processor = postcss(plugins)
+
+const processCss = deasync((src, cb) => {
+  processor.process(src)
+  .then(result => cb(null, result))
+  .catch((err) => cb(err))
+})
 
 /**
  * Define babel plugin that analyze tagged template literals
@@ -74,7 +94,7 @@ function extractCss (path, isGlobal = false) {
   }, []).join('')
 
   const prefix = isGlobal ? '' : '.c' + stringHash(code)
-  const result = processor.process(prefix + src)
+  const result = processCss(prefix + src)
   const newSrc = result.css.replace(/stub-[0-9]+/gm, x => '${' + stubCtx[x] + '}')
   return { src: newSrc, root: result.root, prefix }
 }

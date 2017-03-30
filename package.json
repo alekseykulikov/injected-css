@@ -12,6 +12,14 @@
     "test": "eslint src test && BABEL_DISABLE_CACHE=1 mocha ./test/index.js",
     "build": "babel src --out-dir lib --presets env"
   },
+  "dependencies": {
+    "babylon": "^6.16.1",
+    "deasync": "^0.1.9",
+    "postcss": "^5.2.16",
+    "postcss-load-config": "^1.2.0",
+    "postcss-nesting": "^2.3.1",
+    "string-hash": "^1.1.3"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-preset-env": "^1.2.2",
@@ -26,11 +34,5 @@
     "eslint-plugin-standard": "^2.1.1",
     "jsdom": "^9.12.0",
     "mocha": "^3.2.0"
-  },
-  "dependencies": {
-    "babylon": "^6.16.1",
-    "postcss": "^5.2.16",
-    "postcss-cssnext": "^2.10.0",
-    "string-hash": "^1.1.3"
   }
 }
