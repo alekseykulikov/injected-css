@@ -51,7 +51,7 @@ module.exports = ({ types: t }) => {
           })
           const propertiesString = transformNestedObjectToString(generateNestedObject(selectors, prefix))
           const injectExpression = parse(`css.inject(\`${src}\`)`).program.body[0].expression
-          path.parentPath.parentPath.insertBefore(t.expressionStatement(injectExpression))
+          path.getStatementParent().insertBefore(t.expressionStatement(injectExpression))
           path.replaceWithSourceString(propertiesString)
         } else if (tag.object && tag.property && tag.object.name === 'inject' && tag.property.name === 'css') {
           const { src } = extractCss(path, true)
