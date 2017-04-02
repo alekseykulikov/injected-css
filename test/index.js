@@ -25,6 +25,10 @@ describe('injected-css', () => {
           background: ${white};
         }
 
+        &[disabled] {
+          cursor: not-allowed;
+        }
+
         @media ${mobile} {
           width: 16rem;
         }

@@ -45,7 +45,7 @@ module.exports = ({ types: t }) => {
         if (tag.name === 'css') {
           const { src, root, prefix } = extractCss(path)
           const selectors = root.nodes.filter((node) => {
-            return node.type === 'rule' && node.selector.indexOf(':') === -1
+            return node.type === 'rule' && !node.selector.includes(':') && !node.selector.includes('[') && !node.selector.includes('>')
           }).map((node) => {
             return node.selector
           })
