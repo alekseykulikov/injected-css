@@ -48,10 +48,11 @@ describe('injected-css', () => {
       }
     }`
 
-    expect(`${style.button}`).equal(`${style}-button`)
-    expect(`${style.button.icon}`).equal(`${style}-button-icon`)
-    expect(`${style.button.text}`).equal(`${style}-button-text`)
-    expect(`${style.logo}`).equal(`${style}-logo`)
+    const prefix = 'c-test'
+    expect(`${style.button}`).equal(`${prefix}-button`)
+    expect(`${style.button.icon}`).equal(`${prefix}-button-icon`)
+    expect(`${style.button.text}`).equal(`${prefix}-button-text`)
+    expect(`${style.logo}`).equal(`${prefix}-logo`)
 
     expect(style).keys(['toString', 'button', 'logo'])
     expect(style.button).keys(['toString', 'icon', 'text'])

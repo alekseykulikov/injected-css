@@ -81,11 +81,11 @@ document.innerHTML = `
 
 ## Benefits
 
-- Write **real CSS** and use JS for import/export, variables and so on
+- Write **real CSS** and use JS for import/export, variables and dynamic strings
 - Built-in naming convention for component world
 - Eslint plugin to ensure CSS best practices
-- Minimal overhead (no parsing cost, 300 byte runtime)
 - Postcss integration ([100s of plugins](https://github.com/postcss/postcss/blob/master/docs/plugins.md) and custom syntaxes like SASS)
+- Minimal overhead (no parsing cost, 300 byte runtime)
 - Server side render support
 
 ## Why another CSS-in-JS library?

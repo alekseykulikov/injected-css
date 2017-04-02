@@ -4,6 +4,7 @@ const postcss = require('postcss')
 const nesting = require('postcss-nesting')
 const loadConfig = require('postcss-load-config')
 const stringHash = require('string-hash')
+const path = require('path')
 
 /**
  * Initialize postcss `processor`.
@@ -40,16 +41,16 @@ const processCss = deasync((src, cb) => {
 module.exports = ({ types: t }) => {
   return {
     visitor: {
-      TaggedTemplateExpression (path) {
+      TaggedTemplateExpression (path, state) {
         const { tag } = path.node
         if (tag.name === 'css') {
-          const { src, root, prefix } = extractCss(path)
+          const { src, root, prefix } = extractCss(path, false, state.opts)
           const selectors = root.nodes.filter((node) => {
             return node.type === 'rule' && !node.selector.includes(':') && !node.selector.includes('[') && !node.selector.includes('>')
           }).map((node) => {
             return node.selector
           })
-          const propertiesString = transformNestedObjectToString(generateNestedObject(selectors, prefix))
+          const propertiesString = transformNestedObjectToString(generateNestedObject(selectors, prefix, prefix.split('-').length))
           const injectExpression = parse(`css.inject(\`${src}\`)`).program.body[0].expression
           path.getStatementParent().insertBefore(t.expressionStatement(injectExpression))
           path.replaceWithSourceString(propertiesString)
@@ -75,7 +76,7 @@ module.exports = ({ types: t }) => {
  * @return {string}
  */
 
-function extractCss (path, isGlobal = false) {
+function extractCss (path, isGlobal = false, config) {
   const code = path.hub.file.code
   const stubs = path.node.quasi.expressions.map(x => code.substring(x.start, x.end))
   const strs = path.node.quasi.quasis.map(x => x.value.cooked)
@@ -93,10 +94,39 @@ function extractCss (path, isGlobal = false) {
     return arr
   }, []).join('')
 
-  const prefix = isGlobal ? '' : '.c' + stringHash(code)
+  const prefix = isGlobal ? '' : generateClassName(src, path.hub.file.opts, config)
   const result = processCss(prefix + src)
   const newSrc = result.css.replace(/stub-[0-9]+/gm, x => '${' + stubCtx[x] + '}')
   return { src: newSrc, root: result.root, prefix }
+}
+
+/**
+ * Generate class name for generic file names: style.js and index.js
+ * using `filenameRelative`.
+ * Cache repeating names in `classes`.
+ *
+ * @param {string} src
+ * @param {Object} fileOpts - { basename, filenameRelative }
+ * @param {Object} config - { namespace, root }
+ * @return {string}
+ */
+
+const classes = new Map()
+function generateClassName (src, { basename, filenameRelative }, { namespace = 'c', root = '' }) {
+  if (basename === 'style' || basename === 'index') {
+    const pathRelative = path.relative(process.cwd(), filenameRelative)
+    const pathWithoutRoot = path.dirname(pathRelative).replace(new RegExp(`^${root}/`), '')
+    const pathBlocks = pathWithoutRoot.split('/')
+    const uniquePathBlocks = pathBlocks.filter((pathBlock, index) => {
+      const nextPathBlock = pathBlocks[index + 1]
+      return !nextPathBlock || nextPathBlock.indexOf(pathBlock) !== 0
+    })
+    const className = uniquePathBlocks.join('-')
+    const increment = classes.get(className) || 1
+    classes.set(className, increment + 1)
+    return `.${namespace}-${className}${increment > 1 ? increment : ''}`
+  }
+  return `.${namespace}-${stringHash(src)}`
 }
 
 /**
@@ -108,12 +138,14 @@ function extractCss (path, isGlobal = false) {
  * @return {Object}
  */
 
-function generateNestedObject (selectors, rootSelector, level = 1) {
+function generateNestedObject (selectors, rootSelector, level) {
   const childrenSelectors = selectors.filter(selector => {
-    return selector !== rootSelector && selector.indexOf(rootSelector) === 0 && selector.split('-').length === (level + 1)
+    return selector !== rootSelector &&
+           selector.indexOf(rootSelector) === 0 &&
+           selector.split('-').length === (level + 1) // TODO optimize selectors filtering
   })
   const children = childrenSelectors.map((childSeletor) => {
-    return generateNestedObject(selectors, childSeletor, level + 1) // TODO optimize selectors filtering
+    return generateNestedObject(selectors, childSeletor, level + 1)
   })
   return { root: rootSelector, children }
 }
