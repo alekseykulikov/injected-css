@@ -1,4 +1,4 @@
-const { parse } = require('babylon')
+const condenseWhitespace = require('condense-whitespace')
 const deasync = require('deasync')
 const postcss = require('postcss')
 const nesting = require('postcss-nesting')
@@ -40,23 +40,36 @@ const processCss = deasync((src, cb) => {
 
 module.exports = ({ types: t }) => {
   return {
+    pre () {
+      this.hashes = new Map()
+      this.classes = new Map()
+    },
+
     visitor: {
       TaggedTemplateExpression (path, state) {
         const { tag } = path.node
         if (tag.name === 'css') {
-          const { src, root, prefix } = extractCss(path, false, state.opts)
+          const { src, root, prefix, noSelector } = extractCss(path, state.opts, this.classes)
           const selectors = root.nodes.filter((node) => {
-            return node.type === 'rule' && !node.selector.includes(':') && !node.selector.includes('[') && !node.selector.includes('>')
+            return node.type === 'rule' &&
+                  !node.selector.includes(':') &&
+                  !node.selector.includes('[') &&
+                  !node.selector.includes('>') &&
+                  !node.selector.substr(1).includes('.') // TODO: improve selectors filtering
           }).map((node) => {
             return node.selector
           })
-          const propertiesString = transformNestedObjectToString(generateNestedObject(selectors, prefix, prefix.split('-').length))
-          const injectExpression = parse(`css.inject(\`${src}\`)`).program.body[0].expression
-          path.getStatementParent().insertBefore(t.expressionStatement(injectExpression))
-          path.replaceWithSourceString(propertiesString)
-        } else if (tag.object && tag.property && tag.object.name === 'inject' && tag.property.name === 'css') {
-          const { src } = extractCss(path, true)
-          path.replaceWithSourceString(`inject.css(\`${src}\`)`)
+          const fileHash = stringHash(path.hub.file.opts.filenameRelative)
+          const increment = this.hashes.get(fileHash) || 1
+          this.hashes.set(fileHash, increment + 1)
+          let propertiesString = `{_css: \`${condenseWhitespace(src).replace(/\n/g, ' ')}\`, _hash: "${fileHash}-${increment}"}`
+          if (noSelector) {
+            const defaultLevel = prefix.split('-').length
+            const nestedObject = generateNestedObject(selectors, prefix, defaultLevel)
+            propertiesString = transformNestedObjectToString(nestedObject, propertiesString)
+          }
+          const isVariable = path.parent.type === 'VariableDeclarator'
+          path.replaceWithSourceString(isVariable ? `css.inject(${propertiesString})` : propertiesString)
         }
       }
     }
@@ -76,7 +89,7 @@ module.exports = ({ types: t }) => {
  * @return {string}
  */
 
-function extractCss (path, isGlobal = false, config) {
+function extractCss (path, config, classes) {
   const code = path.hub.file.code
   const stubs = path.node.quasi.expressions.map(x => code.substring(x.start, x.end))
   const strs = path.node.quasi.quasis.map(x => x.value.cooked)
@@ -94,10 +107,11 @@ function extractCss (path, isGlobal = false, config) {
     return arr
   }, []).join('')
 
-  const prefix = isGlobal ? '' : generateClassName(src, path.hub.file.opts, config)
-  const result = processCss(prefix + src)
+  const prefix = generateClassName(src, path.hub.file.opts, config, classes)
+  const noSelector = src.trim()[0] === '{'
+  const result = processCss(noSelector ? `${prefix} ${src}` : src)
   const newSrc = result.css.replace(/stub-[0-9]+/gm, x => '${' + stubCtx[x] + '}')
-  return { src: newSrc, root: result.root, prefix }
+  return { src: newSrc, root: result.root, prefix, noSelector }
 }
 
 /**
@@ -111,8 +125,7 @@ function extractCss (path, isGlobal = false, config) {
  * @return {string}
  */
 
-const classes = new Map()
-function generateClassName (src, { basename, filenameRelative }, { namespace = 'c', root = '' }) {
+function generateClassName (src, { basename, filenameRelative }, { namespace = 'c', root = '' }, classes) {
   if (basename === 'style' || basename === 'index') {
     const pathRelative = path.relative(process.cwd(), filenameRelative)
     const pathWithoutRoot = path.dirname(pathRelative).replace(new RegExp(`^${root}/`), '')
@@ -154,19 +167,27 @@ function generateNestedObject (selectors, rootSelector, level) {
  * Generate JS representation of nested object.
  *
  * @param  {Object} obj
+ * @param  {String} [initialStr]
  * @return [string]
  */
 
-function transformNestedObjectToString (obj) {
+function transformNestedObjectToString (obj, initialStr = '') {
   if (obj.children.length) {
     const children = obj.children.map((child) => {
       const prop = child.root.replace(obj.root + '-', '')
       return `"${prop}": ${transformNestedObjectToString(child)}`
     })
-    return `{
-      toString() { return "${obj.root.substr(1)}" },
-      ${children.join(',')}
-    }`
+    return initialStr
+      ? initialStr.replace(/}$/, `,
+          toString() { return "${obj.root.substr(1)}" },
+          ${children.join(',')}
+        }`)
+      : `{
+          toString() { return "${obj.root.substr(1)}" },
+          ${children.join(',')}
+        }`
   }
-  return `"${obj.root.substr(1)}"` // remove "." from begining
+  return initialStr
+    ? initialStr.replace(/}$/, `, toString() { return "${obj.root.substr(1)}" } }`)
+    : `"${obj.root.substr(1)}"` // remove "." from begining
 }

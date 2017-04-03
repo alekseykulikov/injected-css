@@ -64,13 +64,12 @@ It transforms to:
 import { css } from 'injected-css';
 import { red, white, mobile } from '../my-theme';
 
-css.inject(`.c3423985940 { text-align: center } .c3423985940-button { background-color: ${red}; width: 32rem; padding: 2rem; border-radius: 0.5rem; border: none
-} .c3423985940-button:hover { background-color: ${white} } @media ${mobile} { .c3423985940-button { width: 16rem } }`);
-
-const style = {
+const style = css.inject({
   toString() { return 'c3423985940'; },
-  button: 'c3423985940-button'
-};
+  button: 'c3423985940-button',
+  _css: `.c3423985940 { text-align: center } .c3423985940-button { background-color: ${red}; width: 32rem; padding: 2rem; border-radius: 0.5rem; border: none
+  } .c3423985940-button:hover { background-color: ${white} } @media ${mobile} { .c3423985940-button { width: 16rem } }`  
+});
 
 document.innerHTML = `
   <div class="${style}">
@@ -85,7 +84,7 @@ document.innerHTML = `
 - Built-in naming convention for component world
 - Eslint plugin to ensure CSS best practices
 - Postcss integration ([100s of plugins](https://github.com/postcss/postcss/blob/master/docs/plugins.md) and custom syntaxes like SASS)
-- Minimal overhead (no parsing cost, 300 byte runtime)
+- Minimal overhead (no parsing cost, 400 byte runtime)
 - Server side render support
 
 ## Why another CSS-in-JS library?

@@ -45,6 +45,11 @@ describe('injected-css', () => {
       &-logo {
         height: 1.6rem;
         width: 1.6rem;
+
+        &.is-large {
+          height: 3.2rem;
+          width: 3.2rem;
+        }
       }
     }`
 
@@ -54,7 +59,7 @@ describe('injected-css', () => {
     expect(`${style.button.text}`).equal(`${prefix}-button-text`)
     expect(`${style.logo}`).equal(`${prefix}-logo`)
 
-    expect(style).keys(['toString', 'button', 'logo'])
+    expect(style).keys(['toString', 'button', 'logo', '_css', '_hash'])
     expect(style.button).keys(['toString', 'icon', 'text'])
     expect(`${style}`).a('string')
     expect(style.logo).a('string')
@@ -62,7 +67,7 @@ describe('injected-css', () => {
   })
 
   it('#inject.css generates global styles', () => {
-    inject.css`
+    inject(css`
       html {
         font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
         font-weight: normal;
@@ -76,6 +81,6 @@ describe('injected-css', () => {
           font-size: 50%; /* 1rem ~ 8px */
         }
       }
-    `
+    `)
   })
 })
