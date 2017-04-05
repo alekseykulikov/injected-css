@@ -81,19 +81,62 @@ document.innerHTML = `
 ## Benefits
 
 - Write **real CSS** and use JS for import/export, variables and dynamic strings
+- Use powerful tools of JS world
+  - ES modules to manage dependencies between styles and JS components
+  - Eslint to ensure, it's hard to write bad CSS
+  - Variables and functions
+  - Webpack 2, Hot Module Replacement, code splitting, and server side render
 - Built-in naming convention for component world
-- Eslint plugin to ensure CSS best practices
 - Postcss integration ([100s of plugins](https://github.com/postcss/postcss/blob/master/docs/plugins.md) and custom syntaxes like SASS)
 - Minimal overhead (no parsing cost, 400 byte runtime)
-- Server side render support
-
-## Why another CSS-in-JS library?
 
 ## Custom postcss config
 
+Just create `.postcssrc.js` file with content similar to ([read more about postcss config](https://github.com/michael-ciniawsky/postcss-load-config)):
+
+```js
+module.exports = (ctx) => ({
+  plugins: [
+    require('postcss-cssnext')({ 'features': { 'rem': false } }),
+    ctx.env === 'production' ? require('cssnano')({ autoprefixer: false }) : false
+  ]
+})
+
+```
+
 ## Inject global styles
 
+Use `inject()` method to insert global `css` string.
+Everything tagged literal with _css``_ will be preparsed with postcss.
+
+```js
+import { inject, css } from 'injected-css'
+import normalizeCss from 'normalize.css'
+import { mobile } from '../my-theme';
+
+// insert regular css, like normalize.css
+
+inject(normalize)
+
+// setup global typography
+
+inject(css`
+  html {
+    font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: normal;
+    font-size: 62.5%; /* 1rem ~ 10px */
+
+    @media ${mobile} {
+      font-size: 56.25%; /* 1rem ~ 9px */
+    }
+  }
+`)
+```
+
 ## Syntax highlight
+
+**Atom** with [language-babel](https://github.com/gandm/language-babel) plugin supports syntax highlight and autocompletion by default.
+<img width="434" alt="atom-language-babel" src="https://cloud.githubusercontent.com/assets/158189/24708649/c7530534-1a17-11e7-845a-d2319a78504a.png">
 
 ## Credits
 
