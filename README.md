@@ -1,4 +1,4 @@
-# injected-css
+<img width="793" alt="{:;} injected-css" src="https://cloud.githubusercontent.com/assets/158189/25124387/d92cd514-242b-11e7-9cc7-91ad902a7d7e.png">
 
 [![](https://travis-ci.org/alekseykulikov/injected-css.png)](https://travis-ci.org/alekseykulikov/injected-css)
 [![](https://img.shields.io/npm/v/injected-css.svg)](https://npmjs.com/package/injected-css)
