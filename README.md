@@ -133,6 +133,31 @@ inject(css`
 `)
 ```
 
+## Server side render
+
+Use `flush()` method to get all css calls.
+
+```js
+import { flush } from 'injected-css'
+import { App } from './App'
+
+const body = renderToStaticMarkup(<App />)
+const css = flush().join('')
+
+const html = `
+  <!doctype html>
+  <html lang='en-US'>
+    <head>      
+      <title>My App</title>
+      <style>${css}</style>
+    </head>
+    <body>
+      ${body}
+    </body>
+  </html>
+`
+```
+
 ## Syntax highlight
 
 **Atom** with [language-babel](https://github.com/gandm/language-babel) plugin supports syntax highlight and autocompletion by default.
