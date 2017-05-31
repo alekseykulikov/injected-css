@@ -3,9 +3,9 @@
   "version": "0.1.2",
   "description": "Structured way to write CSS in JS file",
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "files": [
-    "lib",
+    "dist",
     "babel.js"
   ],
   "engines": {
@@ -14,7 +14,7 @@
   "scripts": {
     "prepublish": "yarn build",
     "test": "eslint src test && BABEL_DISABLE_CACHE=1 mocha ./test/index.js",
-    "build": "babel src --out-dir lib --presets env"
+    "build": "babel src --out-dir dist --presets env"
   },
   "dependencies": {
     "condense-whitespace": "^1.0.0",
