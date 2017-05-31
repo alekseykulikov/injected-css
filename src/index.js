@@ -1,5 +1,17 @@
 
 /**
+ * Detect server render.
+ */
+
+const isServer = typeof window === 'undefined'
+let styles = {}
+export const flush = () => {
+  const ret = Object.keys(styles).map((key) => styles[key])
+  styles = {}
+  return ret
+}
+
+/**
  * Cache style tags to avoid double injection.
  */
 
@@ -15,6 +27,15 @@ const styleTags = {}
 export function inject (obj) {
   const str = typeof obj === 'string' ? obj : obj._css
   const hash = typeof obj === 'string' ? stringHash(str) : obj._hash
+
+  if (isServer) {
+    return new Proxy(obj, {
+      get (target, prop, receiver) {
+        if (prop !== '_css' && !styles[hash]) styles[hash] = str
+        return target[prop]
+      }
+    })
+  }
 
   if (styleTags[hash]) {
     const tag = styleTags[hash]
