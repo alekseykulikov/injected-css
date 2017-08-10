@@ -19,7 +19,7 @@
   "dependencies": {
     "condense-whitespace": "^1.0.0",
     "deasync": "^0.1.9",
-    "postcss": "^5.2.17",
+    "postcss": "^6.0.8",
     "postcss-load-config": "^1.2.0",
     "postcss-nesting": "^4.0.1",
     "string-hash": "^1.1.3"

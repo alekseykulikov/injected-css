@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import { expect } from 'chai'
-import { jsdom } from 'jsdom'
+import { jsdom } from 'jsdom/lib/old-api'
 import { red, white, mobile, medium } from './support/theme'
 import { css, inject } from '../src'
 
