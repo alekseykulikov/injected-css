@@ -1,7 +1,7 @@
 import condenseWhitespace from 'condense-whitespace'
 import deasync from 'deasync'
 import postcss from 'postcss'
-import nesting from 'postcss-nesting'
+import nested from 'postcss-nested'
 import loadConfig from 'postcss-load-config'
 import stringHash from 'string-hash'
 import path from 'path'
@@ -19,7 +19,7 @@ const parseConfig = deasync(cb => {
 })
 
 const config = parseConfig()
-const plugins = (config.plugins || []).concat(nesting())
+const plugins = (config.plugins || []).concat([nested()])
 const processor = postcss(plugins)
 
 const processCss = deasync((src, cb) => {

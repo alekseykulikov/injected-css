@@ -1,12 +1,12 @@
 /* eslint-env mocha */
 import { expect } from 'chai'
-import { jsdom } from 'jsdom'
+import { JSDOM } from 'jsdom'
 import { red, white, mobile, medium } from './support/theme'
 import { css, inject } from '../src'
 
 describe('injected-css', () => {
   beforeEach(() => {
-    global.document = jsdom()
+    global.document = new JSDOM()
   })
 
   it('#css generates object with class names', () => {
