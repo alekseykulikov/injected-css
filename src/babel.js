@@ -19,7 +19,7 @@ const parseConfig = deasync(cb => {
 })
 
 const config = parseConfig()
-const plugins = (config.plugins || []).concat([nested()])
+const plugins = [nested({ preserveEmpty: true })].concat(config.plugins || [])
 const processor = postcss(plugins)
 
 const processCss = deasync((src, cb) => {
