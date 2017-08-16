@@ -1,20 +1,18 @@
-const condenseWhitespace = require('condense-whitespace')
-const deasync = require('deasync')
-const postcss = require('postcss')
-const nesting = require('postcss-nesting')
-const loadConfig = require('postcss-load-config')
-const stringHash = require('string-hash')
-const path = require('path')
+import condenseWhitespace from 'condense-whitespace'
+import deasync from 'deasync'
+import postcss from 'postcss'
+import nesting from 'postcss-nesting'
+import loadConfig from 'postcss-load-config'
+import stringHash from 'string-hash'
+import path from 'path'
 
 /**
  * Initialize postcss `processor`.
  * Use `deasync` to make async methods sync.
  */
 
-const parseConfig = deasync((cb) => {
-  loadConfig({}, '', { argv: false })
-  .then(c => cb(null, c))
-  .catch((err) => {
+const parseConfig = deasync(cb => {
+  loadConfig({}, '', { argv: false }).then(c => cb(null, c)).catch(err => {
     if (err.toString().indexOf('No PostCSS Config found in') !== -1) return cb(null, {}) // ignore, not required
     return cb(err)
   })
@@ -25,9 +23,7 @@ const plugins = (config.plugins || []).concat(nesting())
 const processor = postcss(plugins)
 
 const processCss = deasync((src, cb) => {
-  processor.process(src)
-  .then(result => cb(null, result))
-  .catch((err) => cb(err))
+  processor.process(src).then(result => cb(null, result)).catch(err => cb(err))
 })
 
 /**
@@ -40,29 +36,36 @@ const processCss = deasync((src, cb) => {
 
 module.exports = ({ types: t }) => {
   return {
-    pre () {
+    pre() {
       this.hashes = new Map()
       this.classes = new Map()
     },
 
     visitor: {
-      TaggedTemplateExpression (path, state) {
+      TaggedTemplateExpression(path, state) {
         const { tag } = path.node
         if (tag.name === 'css') {
           const { src, root, prefix, noSelector } = extractCss(path, state.opts, this.classes)
-          const selectors = root.nodes.filter((node) => {
-            return node.type === 'rule' &&
-                  !node.selector.includes(':') &&
-                  !node.selector.includes('[') &&
-                  !node.selector.includes('>') &&
-                  !node.selector.substr(1).includes('.') // TODO: improve selectors filtering
-          }).map((node) => {
-            return node.selector
-          })
+          const selectors = root.nodes
+            .filter(node => {
+              return (
+                node.type === 'rule' &&
+                !node.selector.includes(':') &&
+                !node.selector.includes('[') &&
+                !node.selector.includes('>') &&
+                !node.selector.substr(1).includes('.')
+              ) // TODO: improve selectors filtering
+            })
+            .map(node => {
+              return node.selector
+            })
           const fileHash = stringHash(path.hub.file.opts.filenameRelative)
           const increment = this.hashes.get(fileHash) || 1
           this.hashes.set(fileHash, increment + 1)
-          let propertiesString = `{_css: \`${condenseWhitespace(src).replace(/\n/g, ' ')}\`, _hash: "${fileHash}-${increment}"}`
+          let propertiesString = `{_css: \`${condenseWhitespace(src).replace(
+            /\n/g,
+            ' '
+          )}\`, _hash: "${fileHash}-${increment}"}`
           if (noSelector) {
             const defaultLevel = prefix.split('-').length
             const nestedObject = generateNestedObject(selectors, prefix, defaultLevel)
@@ -89,7 +92,7 @@ module.exports = ({ types: t }) => {
  * @return {string}
  */
 
-function extractCss (path, config, classes) {
+function extractCss(path, config, classes) {
   const code = path.hub.file.code
   const stubs = path.node.quasi.expressions.map(x => code.substring(x.start, x.end))
   const strs = path.node.quasi.quasis.map(x => x.value.cooked)
@@ -99,13 +102,15 @@ function extractCss (path, config, classes) {
   }, {})
 
   let ctr = 0
-  const src = strs.reduce((arr, str, i) => {
-    arr.push(str)
-    if (i !== stubs.length) {
-      arr.push('stub-' + ctr++)
-    }
-    return arr
-  }, []).join('')
+  const src = strs
+    .reduce((arr, str, i) => {
+      arr.push(str)
+      if (i !== stubs.length) {
+        arr.push('stub-' + ctr++)
+      }
+      return arr
+    }, [])
+    .join('')
 
   const prefix = generateClassName(src, path.hub.file.opts, config, classes)
   const noSelector = src.trim()[0] === '{'
@@ -125,7 +130,7 @@ function extractCss (path, config, classes) {
  * @return {string}
  */
 
-function generateClassName (src, { basename, filenameRelative }, { namespace = 'c', root = '' }, classes) {
+function generateClassName(src, { basename, filenameRelative }, { namespace = 'c', root = '' }, classes) {
   if (basename === 'style' || basename === 'index') {
     const pathRelative = path.relative(process.cwd(), filenameRelative)
     const pathWithoutRoot = path.dirname(pathRelative).replace(new RegExp(`^${root}/`), '')
@@ -151,13 +156,15 @@ function generateClassName (src, { basename, filenameRelative }, { namespace = '
  * @return {Object}
  */
 
-function generateNestedObject (selectors, rootSelector, level) {
+function generateNestedObject(selectors, rootSelector, level) {
   const childrenSelectors = selectors.filter(selector => {
-    return selector !== rootSelector &&
-           selector.indexOf(rootSelector) === 0 &&
-           selector.split('-').length === (level + 1) // TODO optimize selectors filtering
+    return (
+      selector !== rootSelector &&
+      selector.indexOf(rootSelector) === 0 &&
+      selector.split('-').length === level + 1
+    ) // TODO optimize selectors filtering
   })
-  const children = childrenSelectors.map((childSeletor) => {
+  const children = childrenSelectors.map(childSeletor => {
     return generateNestedObject(selectors, childSeletor, level + 1)
   })
   return { root: rootSelector, children }
@@ -171,17 +178,20 @@ function generateNestedObject (selectors, rootSelector, level) {
  * @return [string]
  */
 
-function transformNestedObjectToString (obj, initialStr = '') {
+function transformNestedObjectToString(obj, initialStr = '') {
   if (obj.children.length) {
-    const children = obj.children.map((child) => {
+    const children = obj.children.map(child => {
       const prop = child.root.replace(obj.root + '-', '')
       return `"${prop}": ${transformNestedObjectToString(child)}`
     })
     return initialStr
-      ? initialStr.replace(/}$/, `,
+      ? initialStr.replace(
+          /}$/,
+          `,
           toString() { return "${obj.root.substr(1)}" },
           ${children.join(',')}
-        }`)
+        }`
+        )
       : `{
           toString() { return "${obj.root.substr(1)}" },
           ${children.join(',')}

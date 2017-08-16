@@ -1,4 +1,3 @@
-
 /**
  * Detect server render.
  */
@@ -6,7 +5,7 @@
 const isServer = typeof window === 'undefined'
 let styles = {}
 export const flush = () => {
-  const ret = Object.keys(styles).map((key) => styles[key])
+  const ret = Object.keys(styles).map(key => styles[key])
   styles = {}
   return ret
 }
@@ -24,13 +23,13 @@ const styleTags = {}
  * @return {Object|string}
  */
 
-export function inject (obj) {
+export function inject(obj) {
   const str = typeof obj === 'string' ? obj : obj._css
   const hash = typeof obj === 'string' ? stringHash(str) : obj._hash
 
   if (isServer) {
     return new Proxy(obj, {
-      get (target, prop, receiver) {
+      get(target, prop, receiver) {
         if (prop !== '_css' && !styles[hash]) styles[hash] = str
         return target[prop]
       }
@@ -56,7 +55,7 @@ export function inject (obj) {
  * Placeholder for babel compiler.
  */
 
-export function css () {
+export function css() {
   throw new Error('Please transform your code with "injected-css/babel"')
 }
 css.inject = inject
@@ -69,7 +68,7 @@ css.inject = inject
  * @return {number} 0..4294967295
  */
 
-function stringHash (str) {
+function stringHash(str) {
   let hash = 5381
   let i = str.length
 

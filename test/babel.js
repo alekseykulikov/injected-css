@@ -1,13 +1,14 @@
 require('babel-register')({
   presets: [
-    ['env', {
-      targets: {
-        node: 6
+    [
+      'env',
+      {
+        targets: {
+          node: 6
+        }
       }
-    }]
+    ]
   ],
   sourceMaps: true,
-  plugins: [
-    require('../src/babel')
-  ]
+  plugins: [require('../dist/babel')]
 })
