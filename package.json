@@ -2,19 +2,18 @@
   "name": "injected-css",
   "version": "0.2.0",
   "description": "Structured way to write CSS in JS file",
+  "repository": "treosh/injected-css",
   "license": "MIT",
   "main": "dist/index.js",
-  "files": [
-    "dist",
-    "babel.js"
-  ],
+  "files": ["dist", "babel.js"],
   "engines": {
     "node": ">=6"
   },
   "scripts": {
     "prepublish": "yarn build",
     "test": "eslint src test && BABEL_DISABLE_CACHE=1 mocha ./test/index.js",
-    "build": "babel src --out-dir dist --presets env"
+    "build": "babel src --out-dir dist --presets env",
+    "dev": "yarn build -- --watch"
   },
   "dependencies": {
     "condense-whitespace": "^1.0.0",
