@@ -10,7 +10,7 @@ describe('injected-css', () => {
   })
 
   it('#css generates object with class names', () => {
-    const style = css`{
+    const style = css`
       text-align: center;
 
       &-button {
@@ -51,7 +51,7 @@ describe('injected-css', () => {
           width: 3.2rem;
         }
       }
-    }`
+    `
 
     const prefix = 'c-test'
     expect(`${style.button}`).equal(`${prefix}-button`)
@@ -69,7 +69,7 @@ describe('injected-css', () => {
   it('#inject.css generates global styles', () => {
     inject(css`
       html {
-        font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
         font-weight: normal;
         font-size: 62.5%; /* 1rem ~ 10px */
 

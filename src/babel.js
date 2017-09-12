@@ -50,7 +50,8 @@ module.exports = ({ types: t }) => {
       TaggedTemplateExpression(path, state) {
         const { tag } = path.node
         if (tag.name === 'css') {
-          const { src, root, prefix, noSelector } = extractCss(path, state.opts, this.classes)
+          const isVariable = path.parent.type === 'VariableDeclarator'
+          const { src, root, prefix } = extractCss(path, state.opts, this.classes, isVariable)
           const selectors = root.nodes
             .filter(node => {
               return (
@@ -71,12 +72,11 @@ module.exports = ({ types: t }) => {
             /\n/g,
             ' '
           )}\`, _hash: "${fileHash}-${increment}"}`
-          if (noSelector) {
+          if (isVariable) {
             const defaultLevel = prefix.split('-').length
             const nestedObject = generateNestedObject(selectors, prefix, defaultLevel)
             propertiesString = transformNestedObjectToString(nestedObject, propertiesString)
           }
-          const isVariable = path.parent.type === 'VariableDeclarator'
           path.replaceWithSourceString(isVariable ? `css.inject(${propertiesString})` : propertiesString)
         }
       }
@@ -97,7 +97,7 @@ module.exports = ({ types: t }) => {
  * @return {string}
  */
 
-function extractCss(path, config, classes) {
+function extractCss(path, config, classes, isVariable) {
   const code = path.hub.file.code
   const stubs = path.node.quasi.expressions.map(x => code.substring(x.start, x.end))
   const strs = path.node.quasi.quasis.map(x => x.value.cooked)
@@ -118,10 +118,9 @@ function extractCss(path, config, classes) {
     .join('')
 
   const prefix = generateClassName(src, path.hub.file.opts, config, classes)
-  const noSelector = src.trim()[0] === '{'
-  const result = processCss(noSelector ? `${prefix} ${src}` : src)
+  const result = processCss(isVariable ? `${prefix}{ ${src} }` : src)
   const newSrc = result.css.replace(/stub-[0-9]+/gm, x => '${' + stubCtx[x] + '}')
-  return { src: newSrc, root: result.root, prefix, noSelector }
+  return { src: newSrc, root: result.root, prefix }
 }
 
 /**
