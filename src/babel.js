@@ -12,10 +12,12 @@ import path from 'path'
  */
 
 const parseConfig = deasync(cb => {
-  loadConfig({}, '', { argv: false }).then(c => cb(null, c)).catch(err => {
-    if (err.toString().indexOf('No PostCSS Config found in') !== -1) return cb(null, {}) // ignore, not required
-    return cb(err)
-  })
+  loadConfig({}, '', { argv: false })
+    .then(c => cb(null, c))
+    .catch(err => {
+      if (err.toString().indexOf('No PostCSS Config found in') !== -1) return cb(null, {}) // ignore, not required
+      return cb(err)
+    })
 })
 
 const config = parseConfig()
@@ -23,7 +25,10 @@ const plugins = [nested({ preserveEmpty: true })].concat(config.plugins || [])
 const processor = postcss(plugins)
 
 const processCss = deasync((src, cb) => {
-  processor.process(src).then(result => cb(null, result)).catch(err => cb(err))
+  processor
+    .process(src)
+    .then(result => cb(null, result))
+    .catch(err => cb(err))
 })
 
 /**

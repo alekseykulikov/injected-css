@@ -5,7 +5,10 @@
   "repository": "treosh/injected-css",
   "license": "MIT",
   "main": "dist/index.js",
-  "files": ["dist", "babel.js"],
+  "files": [
+    "dist",
+    "babel.js"
+  ],
   "engines": {
     "node": ">=6"
   },
@@ -18,28 +21,28 @@
   "dependencies": {
     "condense-whitespace": "^1.0.0",
     "deasync": "^0.1.10",
-    "postcss": "^6.0.9",
+    "postcss": "^6.0.11",
     "postcss-load-config": "^1.2.0",
     "postcss-nested": "^2.1.2",
     "string-hash": "^1.1.3"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
+    "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.0",
-    "babel-register": "^6.24.1",
+    "babel-register": "^6.26.0",
     "babelify": "^7.3.0",
-    "chai": "^4.1.1",
+    "chai": "^4.1.2",
     "env-test": "^1.0.0",
-    "eslint": "^4.4.1",
-    "eslint-config-prettier": "^2.3.0",
+    "eslint": "^4.6.1",
+    "eslint-config-prettier": "^2.4.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-prettier": "^2.2.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
-    "jsdom": "^11.1.0",
-    "mocha": "^3.5.0",
-    "prettier": "^1.5.3"
+    "jsdom": "^11.2.0",
+    "mocha": "^3.5.3",
+    "prettier": "^1.6.1"
   }
 }
