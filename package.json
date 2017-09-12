@@ -1,6 +1,6 @@
 {
   "name": "injected-css",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Structured way to write CSS in JS file",
   "repository": "treosh/injected-css",
   "license": "MIT",
