@@ -31,7 +31,7 @@ and refer to resulted classes using `style` object.
 import { css } from 'injected-css'
 import { red, white, mobile } from '../my-theme' // use js variables
 
-const style = css`{
+const style = css`
   text-align: center;
 
   &-button {
@@ -49,7 +49,7 @@ const style = css`{
       width: 16rem;
     }
   }
-}`
+`
 
 document.innerHTML = `
   <div class="${style}">
@@ -142,7 +142,7 @@ import { flush } from 'injected-css'
 import { App } from './App'
 
 const body = renderToStaticMarkup(<App />)
-const css = flush().join('')
+const css = reset._css + flush().join('')
 
 const html = `
   <!doctype html>
@@ -156,6 +156,18 @@ const html = `
     </body>
   </html>
 `
+
+const reset = inject(css`
+  html {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+
+  body {
+    margin: 0;
+  }
+`)
 ```
 
 ## Syntax highlight
