@@ -1,8 +1,8 @@
 {
   "name": "injected-css",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Structured way to write CSS in JS file",
-  "repository": "treosh/injected-css",
+  "repository": "alekseykulikov/injected-css",
   "license": "MIT",
   "main": "dist/index.js",
   "files": [
