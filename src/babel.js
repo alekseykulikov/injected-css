@@ -6,6 +6,9 @@ import loadConfig from 'postcss-load-config'
 import stringHash from 'string-hash'
 import path from 'path'
 
+const cssClassNameRe = /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*$/
+const cssClassNameCleanRe = /[^\w\/-]/g
+
 /**
  * Initialize postcss `processor`.
  * Use `deasync` to make async methods sync.
@@ -143,7 +146,10 @@ function generateClassName(src, { basename, filenameRelative }, { namespace = 'c
       const nextPathBlock = pathBlocks[index + 1]
       return !nextPathBlock || nextPathBlock.indexOf(pathBlock) !== 0
     })
-    const className = uniquePathBlocks.join('-')
+    const className = uniquePathBlocks.join('-').replace(cssClassNameCleanRe, '_')
+    if (!cssClassNameRe.test(className)) {
+      console.error(`Warning: invalid CSS class name '${className}'. Validation with regular expression '${cssClassNameRe}' failed.`)
+    }
     const increment = classes.get(className) || 1
     classes.set(className, increment + 1)
     return `.${namespace}-${className}${increment > 1 ? increment : ''}`
