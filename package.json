@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "condense-whitespace": "^1.0.0",
-    "deasync": "^0.1.10",
+    "deasync": "^0.1.21",
     "postcss": "^6.0.13",
     "postcss-load-config": "^1.2.0",
     "postcss-nested": "^2.1.2",
